@@ -1,4 +1,4 @@
-# TulaPramaan
+# eTulamaan
 
 **Unified Online Verification & Digital Certification Platform for Weighing & Measuring Instruments**
 
@@ -11,7 +11,7 @@ SIH Problem Statement **26036** · Built under the Legal Metrology Act, 2009 & L
 ## Table of Contents
 
 - [The Problem](#the-problem)
-- [What TulaPramaan Does](#what-tulapramaan-does)
+- [What eTulamaan Does](#what-eTulamaan-does)
 - [System Architecture](#system-architecture)
 - [End-to-End Workflow](#end-to-end-workflow)
 - [Certificate Issuance & Verification](#certificate-issuance--verification)
@@ -27,9 +27,9 @@ SIH Problem Statement **26036** · Built under the Legal Metrology Act, 2009 & L
 
 ## The Problem
 
-Verification of weighing and measuring instruments today is manual and siloed: paper applications, disconnected local record-keeping, no way for a consumer or regulator to confirm a certificate is genuine, and no cross-jurisdiction visibility into what's overdue for re-verification. TulaPramaan digitizes every step of this lifecycle into one national, auditable platform.
+Verification of weighing and measuring instruments today is manual and siloed: paper applications, disconnected local record-keeping, no way for a consumer or regulator to confirm a certificate is genuine, and no cross-jurisdiction visibility into what's overdue for re-verification. eTulamaan digitizes every step of this lifecycle into one national, auditable platform.
 
-## What TulaPramaan Does
+## What eTulamaan Does
 
 - **Online registration** for instrument owners, LMOs, and GATCs, with e-KYC (Aadhaar/DigiLocker)
 - **Fully online applications** for verification and re-verification, including fee payment
@@ -268,7 +268,7 @@ Full stack rationale: [`docs/Architecture.md`](docs/Architecture.md).
 
 ```bash
 # Clone
-git clone <repo-url> && cd tulapramaan
+git clone <repo-url> && cd eTulamaan
 
 # Backend service (example — repeat per service)
 cd services/<service-name> && npm install && npm run dev

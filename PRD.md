@@ -1,4 +1,4 @@
-# PRD — TulaPramaan
+# PRD — eTulamaan
 
 Unified Online Verification & Digital Certification Platform for Weighing & Measuring Instruments
 SIH Problem Statement 26036 · Legal Metrology Act, 2009 & Rules, 2011
@@ -9,7 +9,7 @@ Status: **Draft — living document.** Update this file whenever scope changes; 
 
 ## 1. Problem
 
-Verification of weighing/measuring instruments today is manual and siloed: paper applications, local-only records, no way for a consumer or regulator to confirm a certificate is genuine, and no cross-jurisdiction visibility into what's overdue. TulaPramaan replaces this with one online, QR-certified, auditable system.
+Verification of weighing/measuring instruments today is manual and siloed: paper applications, local-only records, no way for a consumer or regulator to confirm a certificate is genuine, and no cross-jurisdiction visibility into what's overdue. eTulamaan replaces this with one online, QR-certified, auditable system.
 
 ## 2. Goals (in priority order)
 

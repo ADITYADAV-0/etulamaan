@@ -4,7 +4,7 @@ This file is what any AI agent (Claude Code or otherwise) should read first when
 
 ## 1. Project in one paragraph
 
-TulaPramaan is a government verification-and-certification platform for weighing/measuring instruments (SIH PS 26036). Four user roles (Owner, LMO, GATC, Admin) interact through a web dashboard, a mobile field-inspection app, and a public no-login certificate-verification page. Read `PRD.md` for what it does and `Architecture.md` for how it's built before changing anything non-trivial.
+eTulamaan is a government verification-and-certification platform for weighing/measuring instruments (SIH PS 26036). Four user roles (Owner, LMO, GATC, Admin) interact through a web dashboard, a mobile field-inspection app, and a public no-login certificate-verification page. Read `PRD.md` for what it does and `Architecture.md` for how it's built before changing anything non-trivial.
 
 ## 2. Required reading order for a new agent/session
 

@@ -1,6 +1,6 @@
 # Architecture.md
 
-How TulaPramaan is built. This is the technical counterpart to `PRD.md`'s "what" — read both before making a structural change, and update this file (plus a `Decision.md` entry) whenever the real architecture diverges from what's written here.
+How eTulamaan is built. This is the technical counterpart to `PRD.md`'s "what" — read both before making a structural change, and update this file (plus a `Decision.md` entry) whenever the real architecture diverges from what's written here.
 
 ## 1. Style
 

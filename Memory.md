@@ -4,7 +4,7 @@ Durable context an AI agent shouldn't have to re-derive (or worse, re-guess) eac
 
 ## 1. Identity
 
-- **Project name:** TulaPramaan ("tula" = weighing scale, "pramaan" = certificate/proof).
+- **Project name:** eTulamaan ("tula" = weighing scale, "pramaan" = certificate/proof).
 - **Problem statement:** SIH 26036 — Development of an Online Verification System for Weighing and Measuring Instruments.
 - **Governing law:** Legal Metrology Act, 2009 and Legal Metrology (General) Rules, 2011. The system must operate within existing law — it does not require new legislation.
 - **Sibling/competing reference systems** (for differentiation, not for copying): eMaap (existing central Legal Metrology portal, emaap.gov.in), assorted state portals (e.g. legalmetrology-up.gov.in). We are more unified and add QR/PKI certification, offline mobile inspection, and public verification, which these largely lack today per our research — but verify current state before making a comparison claim in any external-facing doc, this space moves.
