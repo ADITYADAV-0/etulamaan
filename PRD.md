@@ -3,7 +3,7 @@
 Unified Online Verification & Digital Certification Platform for Weighing & Measuring Instruments
 SIH Problem Statement 26036 · Legal Metrology Act, 2009 & Rules, 2011
 
-Status: **Draft — living document.** Update this file whenever scope changes; don't let it drift from what's actually being built. See `Decision.md` for why a requirement changed and `Memory.md` for domain context an agent needs before touching this file.
+Status: **Active — Part 1 Mobile App Completed.** Full feature set across Owner, LMO, and Public QR Verification roles built and verified against API contracts. See `Decision.md` ADR-006 for mobile role scoping and `Memory.md` for current implementation state.
 
 ---
 

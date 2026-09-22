@@ -41,6 +41,13 @@ Log of significant decisions, in ADR format. Append new entries at the bottom wi
 - **Decision:** Every inspection task gets a unique ID at scheduling time (server-side, before the officer goes offline). The mobile app writes locally against that ID; on sync, the server treats it as an idempotent upsert keyed by task ID rather than a blind insert.
 - **Consequences:** Requires scheduling to always happen online (before the officer heads into the field) — an inspection can't be freely created client-side with no server-known task ID. This is an acceptable constraint given the existing assignment workflow.
 
+### ADR-006 — Focus Mobile App Role Surfaces on Owner, LMO, and Public Roles
+
+- **Status:** Accepted
+- **Context:** Mobile application usage is primarily designed for field operations (LMO offline inspection), trader self-service (Owner dashboard & application), and instant verification by citizens/consumers (Public QR scanning). Heavy administrative analytics and reporting are better suited for the web application (Part 2).
+- **Decision:** The Part 1 mobile app implements explicit navigation, UI components, and role workflows tailored to **Owner**, **LMO**, and **Public** roles, while maintaining shared contracts in `packages/shared-types` and design tokens in `packages/ui-kit` for full compatibility with Part 2 web app expansion.
+- **Consequences:** Keeps the mobile app UX focused, fast, and optimized for field use while preserving complete data model alignment for future web portal roles.
+
 ---
 
 ## Template for new entries

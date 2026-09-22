@@ -4,7 +4,7 @@ This file is what any AI agent (Claude Code or otherwise) should read first when
 
 ## 1. Project in one paragraph
 
-eTulamaan is a government verification-and-certification platform for weighing/measuring instruments (SIH PS 26036). Four user roles (Owner, LMO, GATC, Admin) interact through a web dashboard, a mobile field-inspection app, and a public no-login certificate-verification page. Read `PRD.md` for what it does and `Architecture.md` for how it's built before changing anything non-trivial.
+eTulamaan is a government verification-and-certification platform for weighing/measuring instruments (SIH PS 26036). User roles (Owner, LMO, Public) interact through a web dashboard, a mobile field-inspection app, and a public no-login certificate-verification page. Read `PRD.md` for what it does and `Architecture.md` for how it's built before changing anything non-trivial.
 
 ## 2. Required reading order for a new agent/session
 
@@ -16,29 +16,18 @@ eTulamaan is a government verification-and-certification platform for weighing/m
 6. `Design.md` — before touching anything UI-facing
 7. `Test.md` — before writing or skipping tests
 
-## 3. Repo layout (target structure)
+## 3. Repo layout (actual structure)
 
 ```
 /apps
-  /web            # React/Next.js dashboards (Owner, LMO/GATC, Admin)
-  /mobile         # React Native field-inspection app (offline-first)
+  /mobile         # React Native field-inspection app (offline-first, Owner, LMO, Public)
 /services
-  /identity       # registration, e-KYC, auth, RBAC
-  /applications    # instrument + application lifecycle
-  /scheduling     # assignment engine
-  /inspection     # checklist, evidence, pass/fail
-  /certification  # QR + PKI signing, certificate repository
-  /notifications  # SMS/email/push alerts
-  /payments       # fee collection, gateway integration
-  /admin-analytics # dashboards, reports, enforcement
+  /mock-api       # Mock API service matching Architecture.md REST contracts
 /packages
-  /shared-types   # cross-service TypeScript types / API contracts
-  /ui-kit         # shared design-system components (see Design.md)
+  /shared-types   # Shared TypeScript types & API contracts
+  /ui-kit         # Shared design-system tokens & components (Design.md)
 /infra            # IaC, Docker/Kubernetes manifests, CI config
-/docs             # this file and its siblings
 ```
-
-If the actual repo doesn't match this yet, that's expected early on — build toward it, and update this section (not silently diverge from it) once the real structure stabilizes.
 
 ## 4. Agent roles (if working as a multi-agent team)
 
@@ -63,20 +52,17 @@ A single agent working solo still follows these boundaries mentally: don't casua
 - **Record decisions, don't just make them.** Any choice that changes architecture, data model, or a documented flow gets an entry in `Decision.md` before (or immediately after) implementation.
 - **When requirements are ambiguous, check `PRD.md` §8 (Open Questions) first.** If it's not there either, add it rather than silently assuming.
 
-## 6. How to run things (fill in as the repo materializes)
+## 6. How to run things
 
 ```bash
-# Backend services (example — adjust per actual service)
-cd services/<service-name> && npm install && npm run dev
+# Backend Mock API Service
+npm --prefix services/mock-api start
 
-# Web app
-cd apps/web && npm install && npm run dev
+# Run API & ADR-005 Integration Tests
+npm --prefix services/mock-api test
 
-# Mobile app
-cd apps/mobile && npm install && npx expo start   # or react-native run-android
-
-# Full test suite
-npm run test        # see Test.md for what this covers and what it doesn't
+# Mobile App (Expo / React Native)
+npm --prefix apps/mobile start
 ```
 
 Keep this section accurate. A stale "how to run this" section is worse than no section — it wastes the next agent's first ten minutes.

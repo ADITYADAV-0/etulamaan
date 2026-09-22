@@ -1,0 +1,13 @@
+{
+  "name": "@etulamaan/shared-types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript definitions and API contracts for eTulaMaan",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

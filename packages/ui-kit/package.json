@@ -1,0 +1,13 @@
+{
+  "name": "@etulamaan/ui-kit",
+  "version": "1.0.0",
+  "description": "Shared Design System Tokens & Components for eTulaMaan",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@etulamaan/shared-types": "file:../shared-types"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -24,25 +24,37 @@ Durable context an AI agent shouldn't have to re-derive (or worse, re-guess) eac
 - PKI signing via a licensed CA / NIC e-Sign, not a self-built CA (ADR-003).
 - 2FA required for officer/admin roles, not for owners (ADR-004).
 - Offline-first mobile sync keyed by server-issued task ID (ADR-005).
+- Mobile application primary user roles focused on **Owner**, **LMO**, and **Public** unauthenticated QR verification (ADR-006).
 
 Don't reopen these without a new ADR and a real reason — re-deriving them from scratch each session wastes time and risks inconsistency.
 
-## 4. Known unknowns (tracked, not guessed)
+## 4. Current Implementation State (Part 1 Completed)
+
+- **`/packages/shared-types`**: Core TypeScript contracts for `User`, `Instrument`, `Application`, `Inspection`, `Certificate`, `DeficiencyMemo`, `AuditLog`, `SyncQueueItem`, and `PublicVerificationResponse`.
+- **`/packages/ui-kit`**: Design system tokens (`Design.md §1`), `<StatusPill>` color logic, typography scale, and WCAG AA compliant dark mode theme.
+- **`/services/mock-api`**: Express backend mock server implementing REST endpoints (`/v1/...`), server-side `AuditLog` generation, ADR-005 idempotent sync, and public verification returning **no owner PII**. Includes passing Jest test suite.
+- **`/apps/mobile`**: React Native mobile app (`eTulaMaan`) supporting:
+  - **Owner Role:** Instrument list, status pills, renewal alerts, 4-step application form, certificate viewer with PDF download.
+  - **LMO Role:** Task queue, 100% offline-first digital inspection checklist, tolerance readings, geo-tagged photo evidence, pass/fail decision, deficiency memo generator, and local sync queue dashboard (`pending`, `syncing`, `synced`, `failed`).
+  - **Public Surface:** QR scanner simulation & manual ID verification returning validity status with zero owner PII.
+  - **Cross-Cutting:** Multilingual i18n layer (Hindi `🇮🇳 हिंदी` & English `🇬🇧 English`), Light/Dark mode (`ThemeContext.tsx`), and secure auth token storage (`secureStore.ts`).
+
+## 5. Known unknowns (tracked, not guessed)
 
 - Exact validity-period table per instrument category — see `PRD.md §8`.
 - Fee schedule per category/state — varies, not yet finalized.
 - Which state/district pilots first — affects `Architecture.md` Phase 1 scope.
 
-## 5. Things that have already been designed once — don't redesign from scratch
+## 6. Things that have already been designed once — don't redesign from scratch
 
 - **The end-to-end lifecycle flow** (Register → Apply+Pay → Auto-assign → Inspect → Pass/Fail → Certify/Deficiency → Repository → Public verify + renewal loop) is fixed and diagrammed. If a proposed change alters this flow, that's a `PRD.md` + `Decision.md` change, not a quiet code change.
 - **Brand palette and core screen layouts** — see `Design.md`. Don't introduce new colors or redesign the certificate card layout ad hoc.
 
-## 6. Working conventions this team has settled on
+## 7. Working conventions this team has settled on
 
 - Docs-first for anything architectural: update `PRD.md`/`Architecture.md`/`Decision.md` *before or alongside* the code, not after the fact as an afterthought.
 - SIH submission constraints (for anyone touching pitch materials, not the app itself): official template caps the idea deck at 6 slides total including title; detailed diagrams like the full swimlane flowchart are separate, standalone documentation artifacts, not squeezed into the pitch deck.
 
-## 7. How to keep this file useful
+## 8. How to keep this file useful
 
 Append, don't rewrite history — if a decision changes, add a dated note rather than deleting the old one, so the "why did we used to do X" question stays answerable. If this file gets long, split stable domain facts (§1–2) from evolving project state (§3–6) into separate files, but only once it's actually unwieldy, not preemptively.
