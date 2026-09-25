@@ -24,6 +24,30 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
 
+type AuthenticatedRequest = Request & { user?: typeof mockUsers[number] };
+
+function authenticate(req: AuthenticatedRequest, res: Response, next: express.NextFunction) {
+  const header = req.header('Authorization');
+  const token = header?.startsWith('Bearer ') ? header.slice(7) : '';
+  const userId = token.startsWith('jwt-mock-token-') ? token.slice('jwt-mock-token-'.length) : '';
+  const user = mockUsers.find(candidate => candidate.id === userId);
+
+  if (!user) {
+    return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'A valid access token is required.' } });
+  }
+
+  req.user = user;
+  next();
+}
+
+function requireRole(req: AuthenticatedRequest, res: Response, roles: Array<'Owner' | 'LMO'>) {
+  if (!req.user || !roles.includes(req.user.role as 'Owner' | 'LMO')) {
+    res.status(403).json({ error: { code: 'FORBIDDEN', message: 'You are not authorized for this action.' } });
+    return false;
+  }
+  return true;
+}
+
 // Health Check
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'eTulaMaan Mock API Service', timestamp: new Date().toISOString() });
@@ -116,23 +140,33 @@ app.post('/v1/auth/e-kyc', (req: Request, res: Response) => {
   res.json({ user, message: 'e-KYC verification successful via DigiLocker / Aadhaar gateway.' });
 });
 
+app.use('/v1', (req: AuthenticatedRequest, res: Response, next) => {
+  if (req.path.startsWith('/auth/') || req.path.startsWith('/public/')) {
+    return next();
+  }
+  return authenticate(req, res, next);
+});
+
 // ----------------------------------------------------
 // INSTRUMENT & APPLICATION ENDPOINTS
 // ----------------------------------------------------
-app.get('/v1/instruments', (req: Request, res: Response) => {
+app.get('/v1/instruments', (req: AuthenticatedRequest, res: Response) => {
   const { ownerId } = req.query;
   let list = mockInstruments;
-  if (ownerId) {
+  if (req.user?.role === 'Owner') {
+    list = list.filter(i => i.ownerId === req.user?.id);
+  } else if (ownerId) {
     list = list.filter(i => i.ownerId === ownerId);
   }
   res.json({ instruments: list });
 });
 
-app.post('/v1/instruments', (req: Request, res: Response) => {
+app.post('/v1/instruments', (req: AuthenticatedRequest, res: Response) => {
+  if (!requireRole(req, res, ['Owner'])) return;
   const { ownerId, category, capacity, manufacturer, serialNo, installationAddress, jurisdiction } = req.body;
   const inst = {
     id: `inst-${Date.now()}`,
-    ownerId: ownerId || 'usr-owner-1',
+    ownerId: req.user!.id,
     category,
     capacity,
     manufacturer,
@@ -146,24 +180,33 @@ app.post('/v1/instruments', (req: Request, res: Response) => {
   res.status(201).json({ instrument: inst });
 });
 
-app.get('/v1/applications', (req: Request, res: Response) => {
+app.get('/v1/applications', (req: AuthenticatedRequest, res: Response) => {
   const { ownerId, officerId } = req.query;
   let list = mockApplications;
-  if (ownerId) {
+  if (req.user?.role === 'Owner') {
+    list = list.filter(a => a.ownerId === req.user?.id);
+  } else if (ownerId) {
     list = list.filter(a => a.ownerId === ownerId);
   }
-  if (officerId) {
+  if (req.user?.role === 'LMO') {
+    list = list.filter(a => a.assignedOfficerId === req.user?.id);
+  } else if (officerId) {
     list = list.filter(a => a.assignedOfficerId === officerId);
   }
   res.json({ applications: list });
 });
 
-app.post('/v1/applications', (req: Request, res: Response) => {
+app.post('/v1/applications', (req: AuthenticatedRequest, res: Response) => {
+  if (!requireRole(req, res, ['Owner'])) return;
   const { instrumentId, ownerId, type, feeAmount, documentUrls, photoUrls } = req.body;
+  const instrument = mockInstruments.find(item => item.id === instrumentId && item.ownerId === req.user!.id);
+  if (!instrument) {
+    return res.status(404).json({ error: { code: 'INSTRUMENT_NOT_FOUND', message: 'Instrument not found for this owner.' } });
+  }
   const appItem: Application = {
     id: `app-${Date.now()}`,
     instrumentId,
-    ownerId: ownerId || 'usr-owner-1',
+    ownerId: req.user!.id,
     type: type || 're-verification',
     status: 'Submitted',
     assignedOfficerId: 'usr-lmo-1',
@@ -235,22 +278,25 @@ app.post('/v1/payments/verify', (req: Request, res: Response) => {
 // ----------------------------------------------------
 // LMO INSPECTION & ADR-005 SYNC ENDPOINTS
 // ----------------------------------------------------
-app.get('/v1/inspections/tasks', (req: Request, res: Response) => {
+app.get('/v1/inspections/tasks', (req: AuthenticatedRequest, res: Response) => {
+  if (!requireRole(req, res, ['LMO'])) return;
   const { officerId } = req.query;
-  let tasks = mockInspectionTasks;
-  if (officerId) {
-    tasks = tasks.filter(t => t.officerId === officerId);
-  }
+  const tasks = mockInspectionTasks.filter(t => t.officerId === req.user!.id && (!officerId || officerId === req.user!.id));
   res.json({ tasks });
 });
 
 // ADR-005 IDEMPOTENT UPSERT SYNC BY TASK ID
-app.post('/v1/inspections/sync', (req: Request, res: Response) => {
+app.post('/v1/inspections/sync', (req: AuthenticatedRequest, res: Response) => {
+  if (!requireRole(req, res, ['LMO'])) return;
   const inspectionPayload: Inspection = req.body;
   const taskId = inspectionPayload.id;
 
   if (!taskId) {
     return res.status(400).json({ error: { code: 'MISSING_TASK_ID', message: 'Task ID is required for sync per ADR-005.' } });
+  }
+
+  if (inspectionPayload.officerId !== req.user!.id) {
+    return res.status(403).json({ error: { code: 'TASK_ACCESS_DENIED', message: 'This inspection is not assigned to you.' } });
   }
 
   const existingTaskIndex = mockInspectionTasks.findIndex(t => t.id === taskId);
@@ -265,23 +311,38 @@ app.post('/v1/inspections/sync', (req: Request, res: Response) => {
   const appItem = mockApplications.find(a => a.id === inspectionPayload.applicationId);
   if (appItem) {
     appItem.status = 'Inspected';
+    const instrument = mockInstruments.find(item => item.id === appItem.instrumentId);
 
     if (inspectionPayload.result === 'pass') {
       appItem.status = 'Certified';
 
+      const existingCertificate = mockCertificates.find(certificate => certificate.applicationId === appItem.id);
+      if (existingCertificate) {
+        return res.json({
+          status: 'synced',
+          taskId,
+          result: inspectionPayload.result,
+          syncedAt: inspectionPayload.syncedAt,
+          applicationStatus: appItem.status,
+          certificateId: existingCertificate.id
+        });
+      }
+
+      const owner = mockUsers.find(user => user.id === appItem.ownerId);
+      const certificateId = `cert-${appItem.id}`;
       const cert: Certificate = {
-        id: `cert-${Date.now()}`,
+        id: certificateId,
         applicationId: appItem.id,
         instrumentId: appItem.instrumentId,
-        instrumentCategory: 'Non-Automatic Weighing Instrument',
-        serialNo: `SR-${appItem.instrumentId}`,
-        ownerName: 'Rajesh Kumar Traders',
+        instrumentCategory: instrument?.category || 'Non-Automatic Weighing Instrument',
+        serialNo: instrument?.serialNo || `SR-${appItem.instrumentId}`,
+        ownerName: owner?.name || 'Registered instrument owner',
         qrPayload: {
-          certificateId: `cert-${Date.now()}`,
-          verificationUrl: `https://etulamaan.gov.in/verify/cert-${Date.now()}`,
-          signatureHash: `hash-${Date.now()}`
+          certificateId,
+          verificationUrl: `https://etulamaan.gov.in/verify/${certificateId}`,
+          signatureHash: `hash-${certificateId}`
         },
-        signature: `NIC-eSign-RSA2048-VALID-${Date.now()}`,
+        signature: `NIC-eSign-RSA2048-VALID-${certificateId}`,
         issuedAt: new Date().toISOString(),
         validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         status: 'valid'
@@ -324,10 +385,14 @@ app.post('/v1/inspections/sync', (req: Request, res: Response) => {
 // ----------------------------------------------------
 // CERTIFICATE & PUBLIC VERIFICATION ENDPOINTS
 // ----------------------------------------------------
-app.get('/v1/certificates/:id', (req: Request, res: Response) => {
+app.get('/v1/certificates/:id', (req: AuthenticatedRequest, res: Response) => {
   const cert = mockCertificates.find(c => c.id === req.params.id || c.applicationId === req.params.id);
   if (!cert) {
     return res.status(404).json({ error: { code: 'CERTIFICATE_NOT_FOUND', message: 'Certificate not found.' } });
+  }
+  const certificateApplication = mockApplications.find(application => application.id === cert.applicationId);
+  if (req.user?.role === 'Owner' && certificateApplication?.ownerId !== req.user.id) {
+    return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'You cannot access another owner\'s certificate.' } });
   }
   res.json({ certificate: cert });
 });

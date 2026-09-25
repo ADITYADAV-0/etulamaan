@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
-import { InstrumentCategory } from '../../../../packages/shared-types/src';
+import { colors } from '@etulamaan/ui-kit';
+import { InstrumentCategory } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
+import { apiFetch } from '../../services/api';
 
 interface ApplyMultiStepFormScreenProps {
   ownerId: string;
@@ -29,14 +30,14 @@ export const ApplyMultiStepFormScreen: React.FC<ApplyMultiStepFormScreenProps> =
   const handleSubmitApplication = async () => {
     setLoading(true);
     try {
-      const instRes = await fetch('http://localhost:4000/v1/instruments', {
+      const instRes = await apiFetch('/instruments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ownerId, category, capacity, manufacturer, serialNo, installationAddress: address })
       });
       const instData = await instRes.json();
 
-      const appRes = await fetch('http://localhost:4000/v1/applications', {
+      const appRes = await apiFetch('/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

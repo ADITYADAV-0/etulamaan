@@ -48,6 +48,13 @@ Log of significant decisions, in ADR format. Append new entries at the bottom wi
 - **Decision:** The Part 1 mobile app implements explicit navigation, UI components, and role workflows tailored to **Owner**, **LMO**, and **Public** roles, while maintaining shared contracts in `packages/shared-types` and design tokens in `packages/ui-kit` for full compatibility with Part 2 web app expansion.
 - **Consequences:** Keeps the mobile app UX focused, fast, and optimized for field use while preserving complete data model alignment for future web portal roles.
 
+### ADR-007 — Centralized authenticated mobile API access
+
+- **Status:** Accepted
+- **Context:** The pilot mobile screens were calling a hard-coded localhost API directly, without bearer tokens, request timeouts, or a device-configurable service URL. That is unsuitable for physical devices and allowed the mock protected routes to be treated as public.
+- **Decision:** Route mobile requests through one API client using `EXPO_PUBLIC_API_URL`, a bounded request timeout, and the current bearer token. Store native authentication tokens with Expo SecureStore; retain only a web/test fallback. Enforce token validation and role/ownership checks in the API service.
+- **Consequences:** Local Android testing must set `EXPO_PUBLIC_API_URL` to a reachable host such as the developer machine's LAN address. The mock API is more faithful to production access control, while payment, e-KYC, signing, and media integrations remain explicit stubs until their external contracts are available.
+
 ---
 
 ## Template for new entries

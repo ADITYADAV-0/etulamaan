@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { colors, getStatusPillColors } from '../../../../packages/ui-kit/src';
-import { PublicVerificationResponse } from '../../../../packages/shared-types/src';
+import { colors, getStatusPillColors } from '@etulamaan/ui-kit';
+import { PublicVerificationResponse } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
+import { apiFetch } from '../../services/api';
 
 export const PublicScanScreen: React.FC = () => {
   const { isDark } = useTheme();
@@ -21,7 +22,7 @@ export const PublicScanScreen: React.FC = () => {
     setVerification(null);
 
     try {
-      const res = await fetch(`http://localhost:4000/v1/public/certificates/${targetId}/verify`);
+      const res = await apiFetch(`/public/certificates/${encodeURIComponent(targetId)}/verify`);
       const data = await res.json();
       if (res.ok && data.verification) {
         setVerification(data.verification);

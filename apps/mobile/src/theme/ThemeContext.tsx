@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { colors } from '../../../packages/ui-kit/src';
+import { colors } from '@etulamaan/ui-kit';
 
 export type ThemeMode = 'light' | 'dark';
 

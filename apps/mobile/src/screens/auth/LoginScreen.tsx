@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
-import { UserRole, User } from '../../../../packages/shared-types/src';
+import { colors } from '@etulamaan/ui-kit';
+import { UserRole, User } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
 import { secureStore } from '../../services/secureStore';
+import { apiFetch } from '../../services/api';
 
 interface LoginScreenProps {
   onLoginSuccess: (user: User, role: UserRole) => void;
@@ -29,7 +30,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     setLoading(true);
     try {
       const loginEmail = selectedRole === 'LMO' ? 'v.sharma@lm.gov.in' : email;
-      const res = await fetch('http://localhost:4000/v1/auth/login', {
+      const res = await apiFetch('/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password, role: selectedRole })

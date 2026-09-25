@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
+import { colors } from '@etulamaan/ui-kit';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
+import { apiFetch } from '../../services/api';
 
 interface EKycScreenProps {
   user: any;
@@ -17,7 +18,7 @@ export const EKycScreen: React.FC<EKycScreenProps> = ({ user, onComplete }) => {
   const handleVerifyKyc = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:4000/v1/auth/e-kyc', {
+      const res = await apiFetch('/auth/e-kyc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, aadhaarNo })

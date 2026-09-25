@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
+import { colors } from '@etulamaan/ui-kit';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
 

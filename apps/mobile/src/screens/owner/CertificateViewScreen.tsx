@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { colors, getStatusPillColors } from '../../../../packages/ui-kit/src';
-import { Certificate } from '../../../../packages/shared-types/src';
+import { colors, getStatusPillColors } from '@etulamaan/ui-kit';
+import { Certificate } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
+import { apiFetch } from '../../services/api';
 
 interface CertificateViewScreenProps {
   certId: string;
@@ -18,7 +19,7 @@ export const CertificateViewScreen: React.FC<CertificateViewScreenProps> = ({ ce
   useEffect(() => {
     const fetchCert = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/v1/certificates/${certId}`);
+        const res = await apiFetch(`/certificates/${encodeURIComponent(certId)}`);
         const data = await res.json();
         if (data.certificate) setCert(data.certificate);
       } catch (e) {

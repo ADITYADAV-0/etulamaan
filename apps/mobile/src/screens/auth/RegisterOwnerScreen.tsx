@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
+import { colors } from '@etulamaan/ui-kit';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
+import { apiFetch } from '../../services/api';
 
 interface RegisterOwnerScreenProps {
   onSuccess: (user: any) => void;
@@ -20,7 +21,7 @@ export const RegisterOwnerScreen: React.FC<RegisterOwnerScreenProps> = ({ onSucc
   const handleRegister = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:4000/v1/auth/register-owner', {
+      const res = await apiFetch('/auth/register-owner', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, phone, jurisdiction })

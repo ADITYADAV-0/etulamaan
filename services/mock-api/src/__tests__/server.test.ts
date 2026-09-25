@@ -46,11 +46,31 @@ describe('eTulaMaan Mock API Server Tests', () => {
 
     const res = await request(app)
       .post('/v1/inspections/sync')
+      .set('Authorization', 'Bearer jwt-mock-token-usr-lmo-1')
       .send(syncPayload);
 
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('synced');
     expect(res.body.applicationStatus).toBe('Certified');
+
+    const firstCertificate = await request(app)
+      .get('/v1/certificates/app-301')
+      .set('Authorization', 'Bearer jwt-mock-token-usr-owner-1');
+    expect(firstCertificate.status).toBe(200);
+    expect(firstCertificate.body.certificate.id).toBe('cert-app-301');
+
+    const repeat = await request(app)
+      .post('/v1/inspections/sync')
+      .set('Authorization', 'Bearer jwt-mock-token-usr-lmo-1')
+      .send(syncPayload);
+    expect(repeat.status).toBe(200);
+    expect(repeat.body.certificateId).toBe('cert-app-301');
+  });
+
+  it('rejects protected requests without a valid access token', async () => {
+    const res = await request(app).get('/v1/instruments');
+    expect(res.status).toBe(401);
+    expect(res.body.error.code).toBe('UNAUTHORIZED');
   });
 
   it('GET /v1/public/certificates/:certId/verify returns public verification with NO OWNER PII', async () => {

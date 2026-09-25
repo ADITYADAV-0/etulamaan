@@ -1,9 +1,9 @@
+import * as ExpoSecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
  * SecureStore wrapper service.
- * Uses expo-secure-store when available, with encrypted memory/storage fallback.
- * Strictly prevents storing JWT or sensitive credentials in unencrypted plain text.
+ * Uses the platform secure keychain on native builds, with a web/test fallback.
  */
 class SecureStoreService {
   private memoryStore: Map<string, string> = new Map();
@@ -11,11 +11,9 @@ class SecureStoreService {
   async setItem(key: string, value: string): Promise<void> {
     try {
       this.memoryStore.set(key, value);
-      // Obfuscated key-value storage for local sandbox/device
-      const encoded = btoa(encodeURIComponent(value));
-      await AsyncStorage.setItem(`_sec_${key}`, encoded);
+      await ExpoSecureStore.setItemAsync(key, value);
     } catch (err) {
-      console.warn('SecureStore setItem fallback:', err);
+      await AsyncStorage.setItem(`_sec_${key}`, value);
     }
   }
 
@@ -24,19 +22,24 @@ class SecureStoreService {
       if (this.memoryStore.has(key)) {
         return this.memoryStore.get(key) || null;
       }
-      const raw = await AsyncStorage.getItem(`_sec_${key}`);
-      if (!raw) return null;
-      const decoded = decodeURIComponent(atob(raw));
-      this.memoryStore.set(key, decoded);
-      return decoded;
-    } catch (err) {
+      const value = await ExpoSecureStore.getItemAsync(key);
+      if (value) {
+        this.memoryStore.set(key, value);
+        return value;
+      }
       return null;
+    } catch (err) {
+      return AsyncStorage.getItem(`_sec_${key}`);
     }
   }
 
   async removeItem(key: string): Promise<void> {
     this.memoryStore.delete(key);
-    await AsyncStorage.removeItem(`_sec_${key}`);
+    try {
+      await ExpoSecureStore.deleteItemAsync(key);
+    } catch (err) {
+      await AsyncStorage.removeItem(`_sec_${key}`);
+    }
   }
 }
 

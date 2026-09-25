@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Switch, RefreshControl } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
-import { Inspection } from '../../../../packages/shared-types/src';
+import { colors } from '@etulamaan/ui-kit';
+import { Inspection } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
 import { syncEngine } from '../../services/syncEngine';
+import { apiFetch } from '../../services/api';
 
 interface LmoTaskQueueScreenProps {
   officerId: string;
@@ -35,7 +36,7 @@ export const LmoTaskQueueScreen: React.FC<LmoTaskQueueScreenProps> = ({
     setLoading(true);
     try {
       if (isOnline) {
-        const res = await fetch(`http://localhost:4000/v1/inspections/tasks?officerId=${officerId}`);
+        const res = await apiFetch(`/inspections/tasks?officerId=${encodeURIComponent(officerId)}`);
         const data = await res.json();
         if (data.tasks) setTasks(data.tasks);
       }

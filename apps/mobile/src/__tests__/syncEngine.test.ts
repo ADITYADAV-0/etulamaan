@@ -1,5 +1,5 @@
 import { syncEngine } from '../services/syncEngine';
-import { Inspection } from '../../../../packages/shared-types/src';
+import { Inspection } from '@etulamaan/shared-types';
 
 describe('ADR-005 Offline Sync Engine Unit Tests', () => {
   const sampleInspection: Inspection = {

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
-import { colors, getStatusPillColors } from '../../../../packages/ui-kit/src';
-import { Instrument, Application } from '../../../../packages/shared-types/src';
+import { colors, getStatusPillColors } from '@etulamaan/ui-kit';
+import { Instrument, Application } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
+import { apiFetch } from '../../services/api';
 
 interface OwnerDashboardScreenProps {
   ownerId: string;
@@ -22,21 +23,27 @@ export const OwnerDashboardScreen: React.FC<OwnerDashboardScreenProps> = ({
   const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [instRes, appRes] = await Promise.all([
-        fetch(`http://localhost:4000/v1/instruments?ownerId=${ownerId}`),
-        fetch(`http://localhost:4000/v1/applications?ownerId=${ownerId}`)
+        apiFetch(`/instruments?ownerId=${encodeURIComponent(ownerId)}`),
+        apiFetch(`/applications?ownerId=${encodeURIComponent(ownerId)}`)
       ]);
       const instData = await instRes.json();
       const appData = await appRes.json();
 
       if (instData.instruments) setInstruments(instData.instruments);
       if (appData.applications) setApplications(appData.applications);
+      if (!instRes.ok || !appRes.ok) {
+        setError('We could not load your instruments. Please try again.');
+      }
     } catch (err) {
       console.error('Error fetching owner data:', err);
+      setError('We could not reach the service. Check your connection and retry.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +85,19 @@ export const OwnerDashboardScreen: React.FC<OwnerDashboardScreenProps> = ({
       {loading ? (
         <ActivityIndicator size="large" color={colors.navy} style={{ marginTop: 20 }} />
       ) : (
-        instruments.map(inst => {
+        error ? (
+          <View style={[styles.errorCard, isDark && styles.darkCard]}>
+            <Text style={[styles.errorText, isDark && styles.darkText]}>{error}</Text>
+            <TouchableOpacity style={styles.retryBtn} onPress={fetchData}>
+              <Text style={styles.retryText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : instruments.length === 0 ? (
+          <View style={[styles.emptyCard, isDark && styles.darkCard]}>
+            <Text style={[styles.emptyTitle, isDark && styles.darkText]}>No instruments registered yet</Text>
+            <Text style={styles.emptyText}>Add your first instrument to begin verification.</Text>
+          </View>
+        ) : instruments.map(inst => {
           const app = applications.find(a => a.instrumentId === inst.id);
           const status = app ? app.status : 'Submitted';
           const pill = getStatusPillColors(status, isDark);
@@ -106,7 +125,7 @@ export const OwnerDashboardScreen: React.FC<OwnerDashboardScreenProps> = ({
                 {status === 'Certified' && (
                   <TouchableOpacity
                     style={styles.viewCertBtn}
-                    onPress={() => onViewCert('cert-8001')}
+                    onPress={() => onViewCert(app?.id || inst.id)}
                   >
                     <Text style={styles.viewCertText}>📜 {t('owner.certificate')}</Text>
                   </TouchableOpacity>
@@ -148,4 +167,11 @@ const styles = StyleSheet.create({
   dateText: { fontSize: 12, color: colors.gray },
   viewCertBtn: { backgroundColor: colors.green, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
   viewCertText: { color: '#FFF', fontWeight: 'bold', fontSize: 12 }
+  ,errorCard: { backgroundColor: '#FFF7ED', borderColor: colors.red, borderWidth: 1, borderRadius: 8, padding: 14, marginBottom: 14 },
+  errorText: { color: colors.red, fontSize: 13, marginBottom: 10 },
+  retryBtn: { alignSelf: 'flex-start', backgroundColor: colors.blue, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6 },
+  retryText: { color: '#FFF', fontWeight: 'bold' },
+  emptyCard: { backgroundColor: '#FFF', borderRadius: 10, padding: 18, marginBottom: 14 },
+  emptyTitle: { color: colors.dark, fontSize: 15, fontWeight: 'bold', marginBottom: 4 },
+  emptyText: { color: colors.gray, fontSize: 12 }
 });

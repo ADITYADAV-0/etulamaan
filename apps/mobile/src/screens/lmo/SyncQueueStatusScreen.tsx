@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
-import { SyncQueueItem } from '../../../../packages/shared-types/src';
+import { colors } from '@etulamaan/ui-kit';
+import { SyncQueueItem } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
 import { syncEngine } from '../../services/syncEngine';

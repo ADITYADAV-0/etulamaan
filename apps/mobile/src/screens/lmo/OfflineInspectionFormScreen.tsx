@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { colors } from '../../../../packages/ui-kit/src';
-import { Inspection, ChecklistCategoryItem, InspectionReading, InspectionResult } from '../../../../packages/shared-types/src';
+import { colors } from '@etulamaan/ui-kit';
+import { Inspection, ChecklistCategoryItem, InspectionReading, InspectionResult } from '@etulamaan/shared-types';
 import { t } from '../../i18n';
 import { useTheme } from '../../theme/ThemeContext';
 import { syncEngine } from '../../services/syncEngine';

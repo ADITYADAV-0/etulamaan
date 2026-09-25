@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
-import { colors } from '../../../packages/ui-kit/src';
-import { User, UserRole, Inspection } from '../../../packages/shared-types/src';
+import { colors } from '@etulamaan/ui-kit';
+import { User, UserRole, Inspection } from '@etulamaan/shared-types';
 import { setLanguage, getCurrentLanguage } from '../i18n';
 import { useTheme } from '../theme/ThemeContext';
+import { secureStore } from '../services/secureStore';
 
 // Screens
 import { PublicScanScreen } from '../screens/public/PublicScanScreen';
@@ -57,6 +58,14 @@ export const AppNavigator: React.FC = () => {
     } else if (role === 'LMO') {
       setCurrentScreen('LMO_QUEUE');
     }
+  };
+
+  const handleLogout = async () => {
+    await secureStore.removeItem('authToken');
+    setCurrentUser(null);
+    setPending2FAUserId('');
+    setActiveTask(null);
+    setCurrentScreen('LOGIN');
   };
 
   return (
@@ -120,7 +129,7 @@ export const AppNavigator: React.FC = () => {
             ownerId={currentUser?.id || 'usr-owner-1'}
             onApplyNew={() => setCurrentScreen('OWNER_APPLY')}
             onViewCert={(certId) => { setActiveCertId(certId); setCurrentScreen('OWNER_CERTIFICATE'); }}
-            onLogout={() => setCurrentScreen('LOGIN')}
+            onLogout={handleLogout}
           />
         )}
 
@@ -144,7 +153,7 @@ export const AppNavigator: React.FC = () => {
             officerId={currentUser?.id || 'usr-lmo-1'}
             onOpenInspection={(task) => { setActiveTask(task); setCurrentScreen('LMO_INSPECT'); }}
             onOpenSyncQueue={() => setCurrentScreen('LMO_SYNC_QUEUE')}
-            onLogout={() => setCurrentScreen('LOGIN')}
+            onLogout={handleLogout}
           />
         )}
 

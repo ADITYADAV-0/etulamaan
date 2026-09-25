@@ -9,5 +9,8 @@
   ],
   "scripts": {
     "test": "echo \"Testing eTulaMaan packages...\""
+  },
+  "dependencies": {
+    "expo": "^57.0.25"
   }
 }

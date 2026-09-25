@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Inspection, SyncQueueItem, SyncStatus } from '../../../packages/shared-types/src';
+import { Inspection, SyncQueueItem, SyncStatus } from '@etulamaan/shared-types';
+import { apiFetch } from './api';
 
 const SYNC_QUEUE_KEY = '@etulamaan_offline_sync_queue';
-const MOCK_API_BASE = 'http://localhost:4000/v1';
 
 export class SyncEngine {
   private queue: SyncQueueItem[] = [];
@@ -112,7 +112,7 @@ export class SyncEngine {
       await this.persistQueue();
 
       try {
-        const response = await fetch(`${MOCK_API_BASE}/inspections/sync`, {
+        const response = await apiFetch('/inspections/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(item.inspectionData)
