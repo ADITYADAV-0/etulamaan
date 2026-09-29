@@ -42,7 +42,7 @@ Verification of weighing and measuring instruments today is manual and siloed: p
 
 ## System Architecture
 
-Microservices behind an API gateway, each service owning one bounded context of the verification lifecycle. Full rationale in [`Architecture.md`](./docs/Architecture.md).
+Microservices behind an API gateway, each service owning one bounded context of the verification lifecycle. Full rationale in [`Architecture.md`](Architecture.md).
 
 ```mermaid
 flowchart TB
