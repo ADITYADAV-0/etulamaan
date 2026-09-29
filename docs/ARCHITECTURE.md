@@ -6,7 +6,7 @@ The application is a modular monolith. Each domain owns its schemas, service log
 graph TD
   UI[Next.js App Router] --> Guard[Middleware and requireRole]
   Guard --> Modules[Domain modules]
-  Modules --> Prisma[(Prisma / PostgreSQL or SQLite)]
+  Modules --> Prisma[(Prisma / MongoDB)]
   Modules --> Audit[Append-only AuditLog]
   Modules --> Notify[Notification channels]
   Certification[Certification engine] --> Signer[LocalKeySigner or NIC e-Sign adapter]

@@ -4,10 +4,12 @@ Digital verification and certification portal for weighing and measuring instrum
 
 ## Run locally
 
+Set `DATABASE_URL` in `.env` to your MongoDB Atlas connection string or another MongoDB replica-set URI.
+
 ```powershell
-Copy-Item .env.example .env
 npm install
 npx prisma generate
+npx prisma db push
 npm run seed
 npm run dev
 ```

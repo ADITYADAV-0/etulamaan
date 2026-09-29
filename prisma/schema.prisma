@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-	provider = "postgresql"
+	provider = "mongodb"
 	url      = env("DATABASE_URL")
 }
 
@@ -50,7 +50,7 @@ enum NotificationChannel {
 }
 
 model User {
-	id String @id @default(cuid())
+	id String @id @default(auto()) @map("_id") @db.ObjectId
 	name String
 	email String @unique
 	phone String?
@@ -69,8 +69,8 @@ model User {
 }
 
 model Instrument {
-	id String @id @default(cuid())
-	ownerId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	ownerId String @db.ObjectId
 	owner User @relation(fields: [ownerId], references: [id])
 	category String
 	make String
@@ -84,14 +84,14 @@ model Instrument {
 }
 
 model Application {
-	id String @id @default(cuid())
-	instrumentId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	instrumentId String @db.ObjectId
 	instrument Instrument @relation(fields: [instrumentId], references: [id])
 	type ApplicationType
 	status ApplicationStatus @default(SUBMITTED)
-	feeAmount Decimal @db.Decimal(12, 2)
+	feeAmountPaise Int
 	paymentStatus PaymentStatus @default(PENDING)
-	assignedOfficerId String?
+	assignedOfficerId String? @db.ObjectId
 	assignedOfficer User? @relation(fields: [assignedOfficerId], references: [id])
 	scheduledFor DateTime?
 	createdAt DateTime @default(now())
@@ -103,8 +103,8 @@ model Application {
 }
 
 model Document {
-	id String @id @default(cuid())
-	applicationId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	applicationId String @db.ObjectId
 	application Application @relation(fields: [applicationId], references: [id])
 	kind String
 	filename String
@@ -112,10 +112,10 @@ model Document {
 }
 
 model Inspection {
-	id String @id @default(cuid())
-	applicationId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	applicationId String @db.ObjectId
 	application Application @relation(fields: [applicationId], references: [id])
-	officerId String
+	officerId String @db.ObjectId
 	officer User @relation(fields: [officerId], references: [id])
 	checklistJson Json
 	readingsJson Json
@@ -128,10 +128,10 @@ model Inspection {
 }
 
 model Certificate {
-	id String @id @default(cuid())
-	applicationId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	applicationId String @db.ObjectId
 	application Application @relation(fields: [applicationId], references: [id])
-	instrumentId String
+	instrumentId String @db.ObjectId
 	instrument Instrument @relation(fields: [instrumentId], references: [id])
 	certNo String @unique
 	contentHash String
@@ -143,26 +143,26 @@ model Certificate {
 }
 
 model DeficiencyMemo {
-	id String @id @default(cuid())
-	applicationId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	applicationId String @db.ObjectId
 	application Application @relation(fields: [applicationId], references: [id])
 	notes String
 	issuedAt DateTime @default(now())
 }
 
 model Payment {
-	id String @id @default(cuid())
-	applicationId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	applicationId String @db.ObjectId
 	application Application @relation(fields: [applicationId], references: [id])
-	amount Decimal @db.Decimal(12, 2)
+	amountPaise Int
 	status PaymentStatus
 	gatewayRef String?
 	createdAt DateTime @default(now())
 }
 
 model Notification {
-	id String @id @default(cuid())
-	userId String
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	userId String @db.ObjectId
 	user User @relation(fields: [userId], references: [id])
 	channel NotificationChannel
 	title String
@@ -172,8 +172,8 @@ model Notification {
 }
 
 model AuditLog {
-	id String @id @default(cuid())
-	actorId String?
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	actorId String? @db.ObjectId
 	actor User? @relation(fields: [actorId], references: [id])
 	action String
 	entity String
@@ -183,15 +183,15 @@ model AuditLog {
 }
 
 model MasterCategory {
-	id String @id @default(cuid())
+	id String @id @default(auto()) @map("_id") @db.ObjectId
 	name String @unique
 	validityMonths Int
-	baseFee Decimal @db.Decimal(12, 2)
+	baseFeePaise Int
 	checklistTemplateJson Json
 }
 
 model Grievance {
-	id String @id @default(cuid())
+	id String @id @default(auto()) @map("_id") @db.ObjectId
 	shopName String
 	location String
 	photoPath String?
