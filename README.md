@@ -42,7 +42,7 @@ Verification of weighing and measuring instruments today is manual and siloed: p
 
 ## System Architecture
 
-Microservices behind an API gateway, each service owning one bounded context of the verification lifecycle. Full rationale in [`Architecture.md`](Architecture.md).
+Microservices behind an API gateway, each service owning one bounded context of the verification lifecycle. Full rationale in [`Architecture.md`](./docs/Architecture.md).
 
 ```mermaid
 flowchart TB
@@ -91,7 +91,7 @@ flowchart TB
 
 ## End-to-End Workflow
 
-Cross-functional lifecycle across actors in the system. Full breakdown in [`PRD.md`](PRD.md).
+Cross-functional lifecycle across actors in the system. Full breakdown in [`PRD.md`](./docs/PRD.md).
 
 ```mermaid
 flowchart LR
@@ -194,7 +194,7 @@ npm run dev
 ```
 Open `http://localhost:3000`.
 
-See [`Agents.md`](Agents.md) for repo conventions and [`Test.md`](Test.md) for what the test suite covers.
+See [`Agents.md`](./docs/Agents.md) for repo conventions and [`Test.md`](./docs/Test.md) for what the test suite covers.
 
 ## Roles & Access
 
@@ -204,20 +204,20 @@ See [`Agents.md`](Agents.md) for repo conventions and [`Test.md`](Test.md) for w
 | **LMO** | Receive assigned inspections, conduct offline inspections, issue pass/fail, sync results |
 | **Public / Consumer** | Scan QR code to verify a certificate — no login required, zero owner PII |
 
-RBAC is enforced server-side on every request — see [`Rules.md`](Rules.md).
+RBAC is enforced server-side on every request — see [`Rules.md`](./docs/Rules.md).
 
 ## Project Documentation
 
 | Doc | Covers |
 |---|---|
-| [`PRD.md`](PRD.md) | Product requirements, personas, success metrics |
-| [`Agents.md`](Agents.md) | How AI/dev agents should work in this repo |
-| [`Design.md`](Design.md) | Brand palette, typography, UI patterns, key screens |
-| [`Architecture.md`](Architecture.md) | Services, data model, API & security design |
-| [`Rules.md`](Rules.md) | Coding, git, secrets, and review conventions |
-| [`Memory.md`](Memory.md) | Domain glossary and durable project context |
-| [`Decision.md`](Decision.md) | Architecture Decision Records (ADRs) |
-| [`Test.md`](Test.md) | Testing strategy and required coverage |
+| [`PRD.md`](./docs/PRD.md) | Product requirements, personas, success metrics |
+| [`Agents.md`](./docs/Agents.md) | How AI/dev agents should work in this repo |
+| [`Design.md`](./docs/Design.md) | Brand palette, typography, UI patterns, key screens |
+| [`Architecture.md`](./docs/Architecture.md) | Services, data model, API & security design |
+| [`Rules.md`](./docs/Rules.md) | Coding, git, secrets, and review conventions |
+| [`Memory.md`](./docs/Memory.md) | Domain glossary and durable project context |
+| [`Decision.md`](./docs/Decision.md) | Architecture Decision Records (ADRs) |
+| [`Test.md`](./docs/Test.md) | Testing strategy and required coverage |
 
 ---
 
