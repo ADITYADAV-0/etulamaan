@@ -1,0 +1,16 @@
+"use client";
+
+import Link from "next/link";
+import { ArrowRight, ShieldCheck } from "lucide-react";
+import { FormEvent, useState } from "react";
+import { TopBar } from "@/components/top-bar";
+import { findDemoUser, type PortalRole } from "@/lib/demo-auth";
+
+const roles: { id: PortalRole; label: string; hint: string }[] = [{ id: "OWNER", label: "Instrument owner", hint: "Manage machines and certificates" }, { id: "OFFICER", label: "LMO / GATC officer", hint: "Review assigned inspections" }, { id: "ADMIN", label: "Administrator", hint: "Manage portal operations" }];
+
+export default function LoginPage() {
+  const [role, setRole] = useState<PortalRole>("OWNER");
+  const [error, setError] = useState("");
+  const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const data = new FormData(event.currentTarget); const user = findDemoUser(String(data.get("email")), String(data.get("password"))); if (!user || user.role !== role) { setError("Those credentials do not match the selected role."); return; } localStorage.setItem("etulamaan_user", JSON.stringify(user)); window.location.href = role === "OWNER" ? "/dashboard" : role === "OFFICER" ? "/officer" : "/admin"; };
+  return <div className="site-shell"><TopBar /><main className="login-layout"><section className="login-intro"><p className="eyebrow">Secure access</p><h1>One portal for every measure.</h1><p>Sign in to manage applications, inspections, certificates, and compliance tasks.</p><div className="login-assurance"><ShieldCheck size={20} /><span>Protected with role-based access and audit trails.</span></div></section><section className="login-card"><div className="login-card-heading"><p className="eyebrow">Welcome back</p><h2>Sign in to eTulaMaan</h2><p className="login-subtitle">Choose your workspace first, then enter your account details.</p></div><form onSubmit={submit}><div className="role-heading"><span>Choose workspace</span><span className="form-note-inline">Secure role access</span></div><div className="role-grid">{roles.map((item) => <button type="button" key={item.id} className={`role-option ${role === item.id ? "selected" : ""}`} onClick={() => { setRole(item.id); setError(""); }}><span className="role-option-icon">{item.id === "OWNER" ? "O" : item.id === "OFFICER" ? "L" : "A"}</span><span><strong>{item.label}</strong><small>{item.hint}</small></span></button>)}</div><div className="demo-credentials demo-credentials-card"><strong>Demo account for {role === "OWNER" ? "Owner" : role === "OFFICER" ? "LMO / GATC Officer" : "Admin"}</strong><span>{role === "OWNER" ? "owner@etulamaan.gov.in / Owner@123" : role === "OFFICER" ? "officer@etulamaan.gov.in / Officer@123" : "admin@etulamaan.gov.in / Admin@123"}</span></div><label htmlFor="email">Email address</label><input id="email" name="email" type="email" placeholder="you@example.com" required /><label htmlFor="password">Password</label><input id="password" name="password" type="password" placeholder="Enter your password" required /><button className="button button-primary full-width" type="submit">Continue as {role === "OFFICER" ? "Officer" : role} <ArrowRight size={16} /></button>{error && <p className="form-error">{error}</p>}</form><p className="login-footer">New owner? <Link href="/register">Create an account</Link></p></section></main></div>;
+}
